@@ -10,7 +10,8 @@ import (
 )
 
 type counters struct {
-	//sync.Mutex
+	// Counters no longer need sync.Mutex, as they're stored in
+	// a syncMap which handles concurrent read/writes
 	view  int
 	click int
 }
@@ -32,9 +33,8 @@ var (
 			Formatted string to be used as a key for the syncMap
 ///////////////////////////////////////////*/
 func makeKeyString(data string) string {
-	format := "2006-01-02 15:04"
 	t := time.Now()
-	tString := t.Format(format)
+	tString := t.Format("2006-01-02 15:04")
 	keyString := fmt.Sprintf("%s:%s", data, tString)
 	return keyString
 }
@@ -78,7 +78,7 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 		list.Store(key, counter)
 	}
 
-	// Error handling
+	// Request error handling
 	err := processRequest(r)
 	if err != nil {
 		fmt.Println(err)
