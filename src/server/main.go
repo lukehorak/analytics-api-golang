@@ -117,10 +117,17 @@ func uploadCounters() error {
 	return nil
 }
 
-func main() {
+func server() error {
 	http.HandleFunc("/", welcomeHandler)
 	http.HandleFunc("/view/", viewHandler)
 	http.HandleFunc("/stats/", statsHandler)
+	return nil
+}
+
+func main() {
+
+	mux := http.NewServeMux()
+	server()
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
