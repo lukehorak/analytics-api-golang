@@ -61,6 +61,25 @@ func processClick(key string) error {
 	return nil
 }
 
+/*///////////////////////////////////////////
+	makeNormalMap()
+		description:
+			Makes a normal map out of sync.Map tempStore
+		parameters:
+			nada!
+		return value:
+			m [*map[string]counters]: a vanilla golang
+			map[string] of counters{} structs
+///////////////////////////////////////////*/
+func makeNormalMap() map[string]counters {
+	m := map[string]counters{}
+	list.Range(func(key, value interface{}) bool {
+		m[fmt.Sprint(key)] = value.(counters)
+		return true
+	})
+	return m
+}
+
 func welcomeHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "Welcome to EQ Works 😎")
 }
@@ -90,25 +109,6 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 	if rand.Intn(100) < 50 {
 		processClick(key)
 	}
-}
-
-/*///////////////////////////////////////////
-	makeNormalMap()
-		description:
-			Makes a normal map out of sync.Map tempStore
-		parameters:
-			nada!
-		return value:
-			m [*map[string]counters]: a vanilla golang
-			map[string] of counters{} structs
-///////////////////////////////////////////*/
-func makeNormalMap() map[string]counters {
-	m := map[string]counters{}
-	list.Range(func(key, value interface{}) bool {
-		m[fmt.Sprint(key)] = value.(counters)
-		return true
-	})
-	return m
 }
 
 func statsHandler(w http.ResponseWriter, r *http.Request) {
