@@ -25,6 +25,21 @@ func init() {
 	go clearUsers()
 }
 
+/*///////////////////////////////////////////
+	getUser()
+		description:
+			Getter function for getting a user's limiter
+			if they exist, or initializing a new user if
+			they don't
+		parameters:
+			ip [string]:
+				The user's IP address, used as the key in
+				the users map
+		return value:
+			u.limiter [*rate.Limiter]: the limiter for
+			the user with given IP 'ip'
+///////////////////////////////////////////*/
+
 func getUser(ip string) *rate.Limiter {
 	mu.Lock()
 	defer mu.Unlock()
@@ -35,17 +50,24 @@ func getUser(ip string) *rate.Limiter {
 		users[ip] = &user{limiter, time.Now()}
 		return limiter
 	}
-
 	u.lastRequest = time.Now()
 	return u.limiter
-
 }
 
-// To be called in a go routine, clears visitors if 3 mins old
+/*///////////////////////////////////////////
+	clearUsers()
+		description:
+			Clears map of user IPs 3 minutes after last request (to avoid an
+			infinite-length of user IPs). Called in a go routine in init(),
+			running alongside the limiter
+		parameters:
+			none!
+		return value:
+			nil
+///////////////////////////////////////////*/
 func clearUsers() {
 	for {
 		time.Sleep(time.Minute)
-
 		mu.Lock()
 		defer mu.Unlock()
 
