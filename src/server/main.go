@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"math/rand"
@@ -102,6 +103,18 @@ func statsHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(429)
 		return
 	}
+
+	m := map[string]interface{}{}
+	list.Range(func(key, value interface{}) bool {
+		m[fmt.Sprint(key)] = fmt.Sprintf("%v", value)
+		return true
+	})
+
+	b, err := json.MarshalIndent(m, "", " ")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(string(b))
 }
 
 func processRequest(r *http.Request) error {
@@ -117,17 +130,12 @@ func uploadCounters() error {
 	return nil
 }
 
-func server() error {
-	http.HandleFunc("/", welcomeHandler)
-	http.HandleFunc("/view/", viewHandler)
-	http.HandleFunc("/stats/", statsHandler)
-	return nil
-}
-
 func main() {
 
 	mux := http.NewServeMux()
-	server()
+	mux.HandleFunc("/", welcomeHandler)
+	mux.HandleFunc("/view/", viewHandler)
+	mux.HandleFunc("/stats/", statsHandler)
 
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(":8080", rateLimit(mux)))
 }
