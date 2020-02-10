@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"math/rand"
@@ -18,8 +17,9 @@ type counters struct {
 }
 
 var (
-	list    sync.Map
-	content = []string{"sports", "entertainment", "business", "education"}
+	mockStore = make(map[string]counters)
+	list      sync.Map
+	content   = []string{"sports", "entertainment", "business", "education"}
 )
 
 /*///////////////////////////////////////////
@@ -92,24 +92,36 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+/*///////////////////////////////////////////
+	makeNormalMap()
+		description:
+			Makes a normal map out of sync.Map tempStore
+		parameters:
+			nada!
+		return value:
+			m [*map[string]counters]: a vanilla golang
+			map[string] of counters{} structs
+///////////////////////////////////////////*/
+func makeNormalMap() map[string]counters {
+	m := map[string]counters{}
+	list.Range(func(key, value interface{}) bool {
+		m[fmt.Sprint(key)] = value.(counters)
+		return true
+	})
+	return m
+}
+
 func statsHandler(w http.ResponseWriter, r *http.Request) {
 	if !isAllowed() {
 		w.WriteHeader(429)
 		return
 	}
+	//m := makeNormalMap()
 
-	// Compile list into plain ol' map for ease of printing
-	m := map[string]interface{}{}
-	list.Range(func(key, value interface{}) bool {
-		m[fmt.Sprint(key)] = fmt.Sprintf("%+v", value)
-		return true
-	})
-
-	b, err := json.MarshalIndent(m, "", " ")
-	if err != nil {
-		panic(err)
+	for key, value := range mockStore {
+		str := fmt.Sprintf("%s --> %v \n", key, value)
+		fmt.Fprint(w, str)
 	}
-	fmt.Fprint(w, string(b))
 }
 
 func processRequest(r *http.Request) error {
@@ -122,8 +134,29 @@ func isAllowed() bool {
 }
 
 func uploadCounters() error {
-	time.Sleep(5 * time.Second)
-	return nil
+	for {
+		time.Sleep(5 * time.Second)
+
+		m := makeNormalMap()
+
+		for key, value := range m {
+			entry, exists := mockStore[key]
+			if !exists {
+				mockStore[key] = value
+			} else {
+				entry.view += value.view
+				entry.click += value.click
+			}
+
+		}
+
+		//Clear tempStore on upload (or we'd have an infinite tempstore!)
+		list.Range(func(key interface{}, value interface{}) bool {
+			list.Delete(key)
+			return true
+		})
+	}
+
 }
 
 func main() {
