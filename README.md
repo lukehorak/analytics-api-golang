@@ -1,6 +1,6 @@
 # Mock Website Analytics API (Golang)
 
-This project was a submission for a take-home assignment, the prompt for which is included below.
+This project was a submission for a take-home assignment, forked from [this repo](https://github.com/EQWorks/ws-product-golang) the prompt for which has been included below.
 
 ## Assignment Prompt
 

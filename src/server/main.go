@@ -81,7 +81,7 @@ func makeNormalMap() map[string]counters {
 }
 
 func welcomeHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "Welcome to EQ Works 😎")
+	fmt.Fprint(w, "Welcome to downtown Coolsville 😎")
 }
 
 func viewHandler(w http.ResponseWriter, r *http.Request) {
