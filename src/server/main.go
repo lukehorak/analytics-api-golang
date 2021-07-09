@@ -116,7 +116,6 @@ func statsHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(429)
 		return
 	}
-	//m := makeNormalMap()
 
 	for key, value := range mockStore {
 		str := fmt.Sprintf("%s --> %v \n", key, value)

@@ -1,4 +1,4 @@
-# Work Sample for Product Role, Golang Variant
+# Mock Website Analytics API (Golang)
 
 This project was a submission for a take-home assignment, the prompt for which is included below.
 
